@@ -59,6 +59,20 @@ export function deletePost(data) {
 }
 
 /**
+ * 获取动态媒体文件
+ * @param {Object} params - 请求参数
+ * @param {Integer} params.postId - 动态ID
+ * @returns {Promise} 返回动态媒体文件列表的Promise
+ */
+export function getPostMedia(params) {
+  return request({
+    url: '/post/media/getPostMedia',
+    method: 'get',
+    params
+  })
+}
+
+/**
  * 切换动态屏蔽状态
  * @param {Object} data - 请求参数
  * @param {Integer} data.postId - 动态ID
@@ -80,6 +94,26 @@ export function getPostStatistics() {
   return request({
     url: '/admin/post/statistics',
     method: 'get'
+  })
+}
+
+/**
+ * 多条件搜索动态
+ * @param {Object} data - 请求数据
+ * @param {String} [data.content] - 动态内容关键词
+ * @param {Integer} [data.userId] - 用户ID
+ * @param {Integer} [data.visibility] - 可见性类型
+ * @param {String} [data.startDate] - 开始日期（格式：yyyy-MM-dd）
+ * @param {String} [data.endDate] - 结束日期（格式：yyyy-MM-dd）
+ * @param {Integer} [data.page=1] - 页码（从1开始）
+ * @param {Integer} [data.size=10] - 每页数量
+ * @returns {Promise} 返回搜索结果的Promise
+ */
+export function searchPosts(data) {
+  return request({
+    url: '/admin/post/search',
+    method: 'post', // 注意这里是POST请求，而不是GET
+    data  // 使用data发送请求体，而不是params
   })
 }
 

@@ -48,7 +48,14 @@ const router = createRouter({
         {
           path: 'posts',
           name: 'posts',
+          meta: { title: '动态管理' },
           component: () => import('../views/posts/PostList.vue')
+        },
+        {
+          path: 'posts/detail',
+          name: 'postDetail',
+          meta: { title: '动态详情', parentMenu: 'posts' },
+          component: () => import('../views/posts/PostDetail.vue')
         },
         {
           path: 'tags',

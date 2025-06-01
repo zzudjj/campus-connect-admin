@@ -2,11 +2,13 @@
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
+import { User, Document, DataLine, Platform, Fold, Expand, CaretBottom } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
 const isCollapse = ref(false)
 const activeMenu = ref('dashboard')
+const showUserMenu = ref(false)
 
 // 计算当前菜单项
 const currentMenuItem = computed(() => {
@@ -137,20 +139,40 @@ const cleanupDOM = () => {
   document.body.style.paddingRight = '';
 }
 
+// 关闭用户菜单的函数
+const closeUserMenu = (e) => {
+  // 检查点击事件是否发生在菜单外部
+  const adminDropdown = document.querySelector('.admin-dropdown');
+  if (adminDropdown && !adminDropdown.contains(e.target)) {
+    showUserMenu.value = false;
+  }
+};
+
 // 组件挂载时
 onMounted(() => {
   cleanupDOM();
   updateActiveMenu();
+  
+  // 添加点击事件监听器，点击页面其他地方时关闭用户菜单
+  document.addEventListener('click', closeUserMenu);
 });
 
 // 组件卸载前清理
 onBeforeUnmount(() => {
   cleanupDOM();
+  // 移除点击事件监听器
+  document.removeEventListener('click', closeUserMenu);
 });
 </script>
 
 <template>
   <el-container class="layout-container">
+    <!-- 全局下拉菜单，放在最外层 -->
+    <div v-if="showUserMenu" class="custom-dropdown-menu" style="position: fixed; top: 60px; right: 20px;">
+      <div class="dropdown-item" @click="handleLogout('logout')">
+        <span>退出登录</span>
+      </div>
+    </div>
     <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
       <div class="logo-container">
         <img src="../assets/logo.png" alt="标志" class="logo" v-if="!isCollapse">
@@ -190,17 +212,14 @@ onBeforeUnmount(() => {
           </el-breadcrumb>
         </div>
         <div class="header-right">
-          <el-dropdown @command="handleLogout">
-            <span class="user-info">
+          <!-- 直接使用按钮组合替代dropdown -->
+          <div class="admin-dropdown">
+            <div class="user-info" @click="showUserMenu = !showUserMenu">
               <el-avatar :size="32" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
               <span class="username">管理员</span>
-            </span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+              <el-icon style="margin-left: 4px; font-size: 12px"><CaretBottom /></el-icon>
+            </div>
+          </div>
         </div>
       </el-header>
 
@@ -342,9 +361,40 @@ onBeforeUnmount(() => {
   color: var(--el-text-color-regular);
 }
 
+.admin-dropdown {
+  position: relative;
+  z-index: 2000;
+}
+
+.custom-dropdown-menu {
+  position: fixed;
+  width: 120px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  border: 1px solid #e4e7ed;
+}
+
+.dropdown-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+
 .main {
   // 添加背景过渡
   transition: background 0.3s ease;
+  overflow-y: auto; // 增加垂直滚动支持
+  height: calc(100vh - 60px); // 高度为全屏高度减去header高度
+  padding: 15px;
+  box-sizing: border-box;
   
   &::before {
     // 优化背景渐变

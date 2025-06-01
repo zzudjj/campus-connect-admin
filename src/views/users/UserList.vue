@@ -545,6 +545,9 @@ onMounted(() => {
 <style scoped>
 .user-list-container {
   padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .card-header-actions {
