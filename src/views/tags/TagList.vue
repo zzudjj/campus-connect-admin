@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAllTags, createSystemTag, searchTags, deleteTag } from '@/api/tag'
 import { Plus, Search, Delete, RefreshRight } from '@element-plus/icons-vue'
+import { formatDateTime } from '@/utils/date'
 
 // 搜索关键词
 const searchKeyword = ref('')
@@ -282,7 +283,11 @@ onMounted(() => {
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createdAt" label="创建时间" width="220" sortable />
+          <el-table-column label="创建时间" width="180" sortable>
+            <template #default="{ row }">
+              {{ formatDateTime(row.createdAt, 'YYYY-MM-DD HH:mm') }}
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="120" fixed="right">
             <template #default="{ row }">
               <div class="operation-buttons">

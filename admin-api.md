@@ -46,6 +46,7 @@
   - [9.2 获取举报详情](#92-获取举报详情)
   - [9.3 获取评论详情](#93-获取评论详情)
   - [9.4 处理举报](#94-处理举报)
+  - [9.5 筛选举报列表](#95-筛选举报列表)
 
 ## 1. 概述
 
@@ -978,6 +979,67 @@ Campus Connect 管理员 API 提供了管理员端所需的各种功能接口，
 }
 ```
 
+### 6.11 获取近30天的新增用户统计
+
+获取近30天（包括当天）的新注册用户数量统计，按日期分组并按升序排列。
+
+**请求URL**: `/admin/user/stats/new-users`
+
+**请求方式**: `GET`
+
+**请求头**:
+- `token`: JWT令牌（管理员权限）
+
+**请求参数**: 无
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "date": "2025-05-03",
+      "count": 12
+    },
+    {
+      "date": "2025-05-04",
+      "count": 15
+    },
+    {
+      "date": "2025-05-05",
+      "count": 8
+    },
+    // ... 其他日期的数据
+    {
+      "date": "2025-06-01",
+      "count": 20
+    }
+  ]
+}
+```
+
+**错误响应**:
+
+```json
+{
+  "code": 401,
+  "message": "未登录",
+  "data": null
+}
+```
+
+或
+
+```json
+{
+  "code": 500,
+  "message": "获取统计数据失败: ...",
+  "data": null
+}
+```
+
 ## 7. 动态管理模块
 
 ### 7.1 分页获取所有动态
@@ -1126,6 +1188,52 @@ Campus Connect 管理员 API 提供了管理员端所需的各种功能接口，
 {
   "code": 404,
   "message": "动态不存在",
+  "data": null
+}
+```
+
+### 7.2 获取当天新增动态数量
+
+获取当天（当前日期）新创建的动态数量统计。
+
+**请求URL**: `/admin/post/today-new-count`
+
+**请求方式**: `GET`
+
+**请求头**:
+- `token`: JWT令牌（管理员权限）
+
+**请求参数**: 无
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "count": 15,
+    "date": "2025-06-02"
+  }
+}
+```
+
+**错误响应**:
+
+```json
+{
+  "code": 403,
+  "message": "无管理员权限",
+  "data": null
+}
+```
+
+或
+
+```json
+{
+  "code": 500,
+  "message": "获取当天新增动态数量失败: ...",
   "data": null
 }
 ```
@@ -2100,6 +2208,91 @@ Campus Connect 管理员 API 提供了管理员端所需的各种功能接口，
 {
   "code": 500,
   "message": "处理举报失败: 举报不存在",
+  "data": null
+}
+```
+
+### 9.5 筛选举报列表
+
+**接口说明**: 根据目标类型和处理状态筛选举报，支持多条件组合查询和分页
+
+**请求URL**: `/report/admin/filter`
+
+**请求方式**: `GET`
+
+**请求头**:
+- `token`: JWT令牌（管理员权限）
+
+**请求参数**:
+
+| 参数名 | 类型 | 必填 | 描述 |
+| ------ | ---- | ---- | ---- |
+| targetType | Integer | 否 | 目标类型：0-用户，1-动态，2-评论 |
+| status | Integer | 否 | 处理状态：0-待处理，1-有效举报，2-无效举报 |
+| page | Integer | 否 | 页码，默认为1 |
+| size | Integer | 否 | 每页大小，默认为10 |
+
+**请求示例**:
+
+```
+/report/admin/filter?targetType=1&status=0&page=1&size=10
+```
+
+**响应示例**:
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": [
+    {
+      "reportId": 1,
+      "reporterId": 101,
+      "targetId": 201,
+      "targetType": 1,
+      "reason": "含有不适当内容",
+      "status": 0,
+      "handledByAdminId": null,
+      "createdAt": "2025-05-20T10:30:15",
+      "handledAt": null,
+      "reporterNickname": "张三",
+      "targetContent": "这是被举报的动态内容摘要...",
+      "targetTypeName": "动态"
+    },
+    {
+      "reportId": 3,
+      "reporterId": 103,
+      "targetId": 203,
+      "targetType": 1,
+      "reason": "垃圾内容",
+      "status": 0,
+      "handledByAdminId": null,
+      "createdAt": "2025-05-19T14:22:10",
+      "handledAt": null,
+      "reporterNickname": "李四",
+      "targetContent": "这是另一个被举报的动态内容摘要...",
+      "targetTypeName": "动态"
+    }
+  ]
+}
+```
+
+**错误响应**:
+
+```json
+{
+  "code": 400,
+  "message": "目标类型参数无效",
+  "data": null
+}
+```
+
+或
+
+```json
+{
+  "code": 500,
+  "message": "筛选举报列表失败: 内部错误",
   "data": null
 }
 ```

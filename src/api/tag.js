@@ -57,7 +57,7 @@ export function deleteTag(tagId) {
 
 /**
  * 获取标签使用统计
- * @returns {Promise} 返回标签使用统计的Promise
+ * @returns {Promise} 返回标签使用统计数据的Promise
  */
 export function getTagStatistics() {
   return request({

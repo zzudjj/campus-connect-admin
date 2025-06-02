@@ -16,6 +16,53 @@ const postTableRef = ref(null)
 // 选择的动态
 const selectedPosts = ref([])
 
+// 日期快捷选择配置
+const dateShortcuts = [
+  {
+    text: '今天',
+    value: () => {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const end = new Date()
+      end.setHours(23, 59, 59, 999)
+      return [today, end]
+    }
+  },
+  {
+    text: '最近7天',
+    value: () => {
+      const end = new Date()
+      end.setHours(23, 59, 59, 999)
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+      start.setHours(0, 0, 0, 0)
+      return [start, end]
+    }
+  },
+  {
+    text: '本月',
+    value: () => {
+      const end = new Date()
+      end.setHours(23, 59, 59, 999)
+      const start = new Date()
+      start.setDate(1)
+      start.setHours(0, 0, 0, 0)
+      return [start, end]
+    }
+  },
+  {
+    text: '最近30天',
+    value: () => {
+      const end = new Date()
+      end.setHours(23, 59, 59, 999)
+      const start = new Date()
+      start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+      start.setHours(0, 0, 0, 0)
+      return [start, end]
+    }
+  }
+]
+
 // 搜索表单
 const searchForm = ref({
   content: '',  // API文档中的content字段
@@ -182,8 +229,8 @@ const fetchPostList = async () => {
 // 更新动态状态
 const handleStatusChange = async (row) => {
   // 判断当前状态并设置新状态
-  const isCurrentlyBlocked = row.visibility === 3;
-  const newVisibility = isCurrentlyBlocked ? 0 : 3; // 如果当前是屏蔽状态，则恢复为公开，否则屏蔽
+  const isCurrentlyBlocked = row.visibility < 0; // 负数表示被屏蔽状态
+  const newVisibility = isCurrentlyBlocked ? 0 : -1; // 如果当前是屏蔽状态，则恢复为公开，否则屏蔽
   const statusText = isCurrentlyBlocked ? '恢复显示' : '屏蔽';
   
   try {
@@ -307,7 +354,7 @@ const handleBatchBlock = async () => {
   
   const postCount = selectedPosts.value.length
   // 只选择非屏蔽状态的动态
-  const filteredPosts = selectedPosts.value.filter(post => post.visibility !== 3) 
+  const filteredPosts = selectedPosts.value.filter(post => post.visibility >= 0) 
   
   if (filteredPosts.length === 0) {
     ElMessage.warning('所选动态已全部处于屏蔽状态')
@@ -334,9 +381,9 @@ const handleBatchBlock = async () => {
     // 使用Promise.all并发处理所有请求
     try {
       const updatePromises = filteredPosts.map(post => {
-        return updatePostStatus({
-          postId: post.postId,
-          status: 3 // 屏蔽状态对应visibility=3
+        // 使用togglePostBlock API切换屏蔽状态
+        return togglePostBlock({
+          postId: post.postId
         })
       })
       
@@ -349,8 +396,10 @@ const handleBatchBlock = async () => {
           // 更新本地数据状态
           const postId = filteredPosts[index].postId
           const tablePost = tableData.value.find(p => p.postId === postId)
-          if (tablePost) {
-            tablePost.visibility = 3
+          if (tablePost && res.data) {
+            // 使用API返回的visibility值更新本地状态
+            tablePost.visibility = res.data.visibility
+            console.log(`动态ID ${postId} 状态已更新为: ${res.data.visibility}`)
           }
         } else {
           failCount++
@@ -388,7 +437,7 @@ const handleBatchRestore = async () => {
   }
   
   // 只选择被屏蔽状态的动态
-  const filteredPosts = selectedPosts.value.filter(post => post.visibility === 3) 
+  const filteredPosts = selectedPosts.value.filter(post => post.visibility < 0) 
   
   if (filteredPosts.length === 0) {
     ElMessage.warning('所选动态中没有被屏蔽的动态')
@@ -415,9 +464,9 @@ const handleBatchRestore = async () => {
     // 使用Promise.all并发处理所有请求
     try {
       const updatePromises = filteredPosts.map(post => {
-        return updatePostStatus({
-          postId: post.postId,
-          status: 0 // 恢复为公开状态，对应visibility=0
+        // 使用togglePostBlock API切换屏蔽状态
+        return togglePostBlock({
+          postId: post.postId
         })
       })
       
@@ -430,8 +479,10 @@ const handleBatchRestore = async () => {
           // 更新本地数据状态
           const postId = filteredPosts[index].postId
           const tablePost = tableData.value.find(p => p.postId === postId)
-          if (tablePost) {
-            tablePost.visibility = 0
+          if (tablePost && res.data) {
+            // 使用API返回的visibility值更新本地状态
+            tablePost.visibility = res.data.visibility
+            console.log(`动态ID ${postId} 状态已恢复为: ${res.data.visibility}`)
           }
         } else {
           failCount++
@@ -570,18 +621,21 @@ onMounted(() => {
         <el-form-item label="发布时间">
           <el-date-picker
             v-model="searchForm.dateRange"
-            type="daterange"
+            type="datetimerange"
             range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
+            start-placeholder="开始日期时间"
+            end-placeholder="结束日期时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 1, 1, 23, 59, 59)]"
+            :shortcuts="dateShortcuts"
             :locale="{
               rangeSeparator: '至',
-              placeholder: '请选择日期',
+              placeholder: '请选择日期时间',
               firstDayOfWeek: 1,
               weekdays: ['日', '一', '二', '三', '四', '五', '六'],
               months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
             }"
+            style="width: 380px;"
           />
         </el-form-item>
         <el-form-item>

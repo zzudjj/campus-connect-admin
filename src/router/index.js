@@ -60,7 +60,21 @@ const router = createRouter({
         {
           path: 'tags',
           name: 'tags',
+          meta: { title: '标签管理' },
           component: () => import('../views/tags/TagList.vue')
+        },
+        {
+          path: 'reports',
+          name: 'reports',
+          meta: { title: '举报管理' },
+          component: () => import('../views/reports/ReportList.vue')
+        },
+        {
+          path: 'reports/:id',
+          name: 'reportDetail',
+          meta: { title: '举报详情', parentMenu: 'reports' },
+          component: () => import('../views/reports/ReportDetail.vue'),
+          props: true
         }
       ]
     }

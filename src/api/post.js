@@ -88,11 +88,22 @@ export function togglePostBlock(data) {
 
 /**
  * 获取动态统计信息
- * @returns {Promise} 返回统计信息的Promise
+ * @returns {Promise} 返回动态统计数据的Promise
  */
 export function getPostStatistics() {
   return request({
     url: '/admin/post/statistics',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取当天新增动态数量
+ * @returns {Promise} 返回当天新增动态数量的Promise
+ */
+export function getTodayNewPostCount() {
+  return request({
+    url: '/admin/post/today-new-count',
     method: 'get'
   })
 }

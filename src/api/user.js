@@ -1,6 +1,20 @@
 import request from './request'
 
 /**
+ * 获取用户公开资料
+ * @param {Object} params - 请求参数
+ * @param {Integer} params.userId - 用户ID
+ * @returns {Promise} 返回用户公开资料的Promise
+ */
+export function getUserPublicProfile(params) {
+  return request({
+    url: '/user/publicProfile',
+    method: 'get',
+    params
+  })
+}
+
+/**
  * 更新用户账号状态
  * @param {Object} data - 请求参数
  * @param {Integer} data.userId - 用户ID
@@ -84,6 +98,17 @@ export function batchUpdateUserStatus(data) {
 export function getOnlineUserCount() {
   return request({
     url: '/admin/user/onlineCount',
+    method: 'get'
+  })
+}
+
+/**
+ * 获取近30天的新增用户统计
+ * @returns {Promise} 返回新增用户统计数据的Promise
+ */
+export function getNewUserStats() {
+  return request({
+    url: '/admin/user/stats/new-users',
     method: 'get'
   })
 }
