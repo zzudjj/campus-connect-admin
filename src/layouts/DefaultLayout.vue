@@ -181,10 +181,8 @@ onBeforeUnmount(() => {
     </div>
     <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
       <div class="logo-container">
-        <img src="../assets/logo.png" alt="标志" class="logo" v-if="!isCollapse">
-        <el-icon v-else>
-          <Platform />
-        </el-icon>
+        <h1 class="project-title" v-if="!isCollapse">校园社交平台</h1>
+        <h1 class="project-title-collapsed" v-else>校</h1>
       </div>
       <el-menu :default-active="activeMenu" class="el-menu-vertical" :collapse="isCollapse" background-color="#304156"
         text-color="#bfcbd9" active-text-color="#409EFF">
@@ -286,11 +284,30 @@ onBeforeUnmount(() => {
   height: 60px;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0 20px;
   color: var(--el-color-primary);
   background: var(--el-color-primary-light-9);
   border-bottom: 1px solid var(--el-border-color);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.project-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--el-color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.project-title-collapsed {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--el-color-primary);
 }
 
 .logo-svg {
