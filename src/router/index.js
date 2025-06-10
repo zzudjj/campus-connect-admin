@@ -70,6 +70,18 @@ const router = createRouter({
           component: () => import('../views/reports/ReportList.vue')
         },
         {
+          path: 'audit',
+          name: 'audit',
+          meta: { title: '审计日志' },
+          component: () => import('../views/audit/AuditLog.vue')
+        },
+        {
+          path: 'audit',
+          name: 'audit',
+          meta: { title: '审计日志' },
+          component: () => import('../views/audit/AuditLog.vue')
+        },
+        {
           path: 'reports/:id',
           name: 'reportDetail',
           meta: { title: '举报详情', parentMenu: 'reports' },

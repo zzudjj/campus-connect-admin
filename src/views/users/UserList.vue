@@ -528,10 +528,10 @@ onMounted(() => {
         <el-pagination
           v-if="total > 0"
           background
-          layout="total, sizes, prev, pager, next"
+          layout="total, sizes, prev, pager, next, jumper"
           :current-page="currentPage"
           :page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
+          :page-sizes="[5, 10, 20, 50, 100]"
           :total="total"
           @current-change="handleCurrentChange"
           @size-change="handleSizeChange"

@@ -2,7 +2,7 @@
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
-import { User, Document, DataLine, Platform, Fold, Expand, CaretBottom, Warning, Collection } from '@element-plus/icons-vue'
+import { User, Document, DataLine, Platform, Fold, Expand, CaretBottom, Warning, Collection, DocumentChecked } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -112,6 +112,12 @@ const menuItems = [
     icon: 'Warning',
     title: '举报管理',
     path: '/reports'
+  },
+  {
+    index: 'audit',
+    icon: 'DocumentChecked',
+    title: '审计日志',
+    path: '/audit'
   }
 ]
 

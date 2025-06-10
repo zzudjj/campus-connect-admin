@@ -47,6 +47,9 @@
   - [9.3 获取评论详情](#93-获取评论详情)
   - [9.4 处理举报](#94-处理举报)
   - [9.5 筛选举报列表](#95-筛选举报列表)
+- [10. 审计日志模块](#10-审计日志模块)
+  - [10.1 分页获取审计日志](#101-分页获取审计日志)
+
 
 ## 1. 概述
 
@@ -2293,6 +2296,80 @@ Campus Connect 管理员 API 提供了管理员端所需的各种功能接口，
 {
   "code": 500,
   "message": "筛选举报列表失败: 内部错误",
+  "data": null
+}
+```
+
+## 10. 审计日志模块
+
+### 10.1 分页获取审计日志
+
+获取系统记录的管理员操作审计日志，支持分页查询。
+
+**请求URL**: `/admin/audit-logs`
+
+**请求方式**: `GET`
+
+**请求头**:
+
+| 参数名 | 类型   | 必填 | 描述     |
+| ------ | ------ | ---- | -------- |
+| token  | String | 是   | JWT 令牌 |
+
+**请求参数** (@RequestParam):
+
+| 参数名 | 类型    | 必填 | 默认值 | 描述         |
+| ------ | ------- | ---- | ------ | ------------ |
+| page   | Integer | 否   | 1      | 页码         |
+| size   | Integer | 否   | 10     | 每页记录数   |
+
+**响应示例** (成功):
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "total": 1,
+    "list": [
+      {
+        "logId": 1,
+        "adminId": 1,
+        "action": "处理举报",
+        "targetEntity": "Report",
+        "targetId": 12,
+        "details": "{\"reportId\":\"12\",\"status\":\"1\"}",
+        "createdAt": "2025-06-10T08:01:20"
+      }
+    ],
+    "pageNum": 1,
+    "pageSize": 10,
+    "size": 1,
+    "startRow": 1,
+    "endRow": 1,
+    "pages": 1,
+    "prePage": 0,
+    "nextPage": 0,
+    "isFirstPage": true,
+    "isLastPage": true,
+    "hasPreviousPage": false,
+    "hasNextPage": false,
+    "navigatePages": 8,
+    "navigatepageNums": [
+      1
+    ],
+    "navigateFirstPage": 1,
+    "navigateLastPage": 1
+  }
+}
+```
+
+**错误响应**:
+
+```json
+{
+  "code": 401,
+  "message": "未授权或令牌无效",
   "data": null
 }
 ```
